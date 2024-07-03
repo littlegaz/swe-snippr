@@ -22,28 +22,28 @@ app.post('/snippet', (req, res) => {
   }
 
   const snippet = {
-    id: id++,
+    id: id++, // generates a unique ID
     language,
     code
   }
 
-  snippets.push(snippet)
-  res.status(201).json(snippet)
-})
+  snippets.push(snippet) // add the new snippet to the array
+  res.status(201).json(snippet)  // return the created snippet with a 201 status code
+});
 
 // get all snippets
-app.get('/snippet', (req, res) => {
+app.get('/snippet', (req, res) => { // localhost:4000/snippit?lang=python
   const { lang } = req.query
 
   if (lang) {
     const filteredSnippets = snippets.filter(
-      snippet => snippet.language.toLowerCase() === lang.toLowerCase()
+      (snippet) => snippet.language.toLowerCase() === lang.toLowerCase()
     )
     return res.json(filteredSnippets)
   }
-
+  // return all snippets if no query parameter is provided
   res.json(snippets)
-})
+});
 
 // get a snippet by ID
 app.get('/snippet/:id', (req, res) => {
