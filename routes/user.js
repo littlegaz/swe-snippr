@@ -1,55 +1,49 @@
-const route = require("express").Router();
-const basicAuth = require("../middleware/basicAuth");
+const route = require('express').Router();
 const bcrypt = require("bcrypt");
 
-const users = [];
+const users = [{ username: "Animal", password:"woop!"}]
 
-route.get("/", async (req,res) => {
-    res.send("Hello World");
+route.get('/', async (req, res) => {
+    res.send('Welcome to the user route');
 });
 
-route.post("/signup", async (req, res) => {
-    const [authType, authString] = req.headers.authorization.split(" ");
-    // console.log("authType", authType, "authString", authString);
-    const[username, password] = Buffer.from(authString, "base64" )
-    .toString("utf-8").split(":");
+route.post('/signup', async (req, res) => {
+    const [authType, authString] = req.headers.authorization.split(" ");   
+        const [username, password] = Buffer.from(authString, "base64")
+    .toString("utf-8")
+    .split(":");
+
     const hashedPassword = await bcrypt.hash(password, 8);
-    // console.log("username, password");
+    users.push({username, password: hashedPassword})
+    console.log(users)
+   
 
-    users.push({username, password: hashedPassword});
-    console.log(users);
-
-    res.send("Account Created");
+    res.send("account created!")
 });
 
 
-route.post("/login", async (req, res) => {
-    const [authType, authString] = req.headers.authorization.split(" ");
-    const[username, password] = Buffer.from(authString, "base64" )
-    .toString("utf-8").split(":");
-    const user = users.find((user) => user.username === username);
-    if (user) {
+route.post("/login", async (req,res)=> {
+    const [authType, authString] = req.headers.authorization.split(" ");  
+    const [username, password] = Buffer.from(authString, "base64")
+    .toString("utf-8")
+    .split(":");
+
+    const user = (users.find(user => user.username === username)); 
+    // && user.password === password));
+
+    if (user){
         const authResult = await bcrypt.compare(password, user.password);
-        if (authResult) {
-            res.send("logged in");
-        } else {
-            res.send("Go Away");
-        } 
+        if(authResult){
+        res.send("logged in")
+        }else {
+            res.send(" Username or Password is incorrect!")
+        }
+        // console.log(user)
     } else {
-        res.send("Go Away!");
+        res.send(" Username or Password is incorrect!")
     }
 
-});
+    // res.send("logged in")
 
-// route.length("/", basicAuth, async (req, res) => {
-//     const {email, password} = req.user;
-//     const id = users.length + 1;
-
-//     const saltRounds = 10;
-//     const hashedPassword 
-// })
-
-
-
-
+})
 module.exports = route;
